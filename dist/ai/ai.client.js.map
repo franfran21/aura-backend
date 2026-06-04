@@ -1,0 +1,1 @@
+{"version":3,"file":"ai.client.js","sourceRoot":"","sources":["../../src/ai/ai.client.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAA4C;AAGrC,IAAM,QAAQ,GAAd,MAAM,QAAQ;IACnB,KAAK,CAAC,OAAO,CAAC,MAAc;QAC1B,OAAO,IAAI,CAAC,SAAS,CAAC;YACpB,KAAK,EAAE,+BAA+B;YACtC,WAAW,EAAE,+MAA+M;SAC7N,CAAC,CAAC;IACL,CAAC;CACF,CAAA;AAPY,4BAAQ;mBAAR,QAAQ;IADpB,IAAA,mBAAU,GAAE;GACA,QAAQ,CAOpB"}
