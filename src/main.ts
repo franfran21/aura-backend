@@ -16,7 +16,8 @@ async function bootstrap() {
   #####################################################################
   `);
 
-  // Escucha el puerto 3000 en todas las interfaces (necesario para acceso desde el móvil)
-  await app.listen(3000, '0.0.0.0');
+  // Escucha en el puerto asignado por Render o 3000 por defecto
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
