@@ -6,6 +6,7 @@ import { InsightsModule } from './insights/insights.module';
 import { AiModule } from './ai-engine/ai.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { CycleModule } from './cycle/cycle.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CycleModule } from './cycle/cycle.module';
     AiModule,
     MetricsModule,
     CycleModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

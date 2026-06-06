@@ -6,6 +6,12 @@ export class Insight {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  title: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @Column({ type: 'text' })
   metricsRaw: string;
 

@@ -18,4 +18,8 @@ export class UsersService {
     const user = this.usersRepository.create(userData);
     return await this.usersRepository.save(user);
   }
+
+  async updatePushToken(userId: number, token: string): Promise<void> {
+    await this.usersRepository.update(userId, { pushToken: token });
+  }
 }
