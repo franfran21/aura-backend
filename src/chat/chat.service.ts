@@ -22,14 +22,14 @@ export class ChatService {
     let contextBlock = '';
 
     if (cycleData) {
-      // Intentar obtener sÃ­ntomas y datos recientes (Ãºltimos 3 dÃ­as)
+      // Intentar obtener síntomas y datos recientes (últimos 3 días)
       // Por brevedad, usamos los datos actuales del ciclo
       contextBlock = `
 [CONTEXTO DEL CICLO DE LA USUARIA - NO MENCIONAR DIRECTAMENTE A MENOS QUE SEA RELEVANTE]
 Día del ciclo: ${cycleData.currentDay} de ${cycleData.avgCycleLength}
 Fase actual: ${cycleData.phase}
 Último periodo: ${cycleData.lastPeriodDate}
-Próxima ovulación estimada: dÃ­a ${cycleData.ovulationDay} del ciclo
+Próxima ovulación estimada: día ${cycleData.ovulationDay} del ciclo
 Próximo periodo estimado: ${cycleData.nextPeriodDate}
 [FIN CONTEXTO]
 
