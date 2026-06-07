@@ -1,20 +1,23 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+﻿import { Controller, Post, Delete, Body, UseGuards, Request } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { CycleService } from '../cycle/cycle.service';
 import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('chat')
 export class ChatController {
-  constructor(
-    private readonly chatService: ChatService,
-    private readonly cycleService: CycleService,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @UseGuards(AuthGuard)
   @Post('message')
   async sendMessage(@Body() body: { message: string }, @Request() req) {
     const userId = req.user.sub;
-    const cycle = await this.cycleService.getCurrentCycle(userId);
-    return await this.chatService.processMessage(userId, body.message, cycle?.phase);
+    return await this.chatService.processMessage(userId, body.message);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('history')
+  async clearHistory(@Request() req) {
+    const userId = req.user.sub;
+    this.chatService.clearHistory(userId);
+    return { success: true, message: 'Historial de chat borrado' };
   }
 }

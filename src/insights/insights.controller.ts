@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, UseGuards, Request, Query } from '@nestjs/common';
 import { InsightsService } from './insights.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AiClient } from '../ai-engine/ai.client';
@@ -11,10 +11,36 @@ export class InsightsController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Post('register')
-  async registerMetrics(@Body() body: { metricsRaw: string }, @Request() req) {
+  @Get('daily')
+  async getDaily(@Request() req, @Query('date') dateQuery?: string) {
+    const userId = req.user.sub;
+    const date = dateQuery ? new Date(dateQuery) : new Date();
+    
+    let insights = await this.insightsService.findDaily(userId, date);
+    
+    if (insights.length === 0) {
+      // Generación automática si no existe
+      return await this.generateDaily(req, dateQuery);
+    }
+    
+    return insights;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('daily/generate')
+  async generateDaily(@Request() req, @Query('date') dateQuery?: string) {
     const userPayload = req.user;
-    return await this.insightsService.createInsight(body.metricsRaw, userPayload);
+    const context = await this.insightsService.getUserCycleContext(userPayload.sub);
+
+    const contextPrompt = `Genera un insight de salud para hoy. La usuaria está en el día ${context?.currentDay || 'desconocido'} de su ciclo, fase: ${context?.phase || 'desconocida'}.`;
+    
+    const diagnosis = await this.aiClient.dispatchAnalysis(contextPrompt, context?.phase);
+
+    const title = `Insight: Fase ${context?.phase || 'Actual'}`;
+    const description = `Día ${context?.currentDay || 'X'} · Análisis Hormonal Luna`;
+
+    const insight = await this.insightsService.createInsight('', userPayload, diagnosis, title, description);
+    return [insight];
   }
 
   @UseGuards(AuthGuard)
@@ -23,32 +49,9 @@ export class InsightsController {
     const userId = req.user.sub;
     const records = await this.insightsService.findByUserId(userId);
     return {
-      system: 'AURAHEALTH+ HYBRID AI',
+      system: 'AURAHEALTH+ LUNA AI',
       count: records.length,
       data: records,
     };
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('daily')
-  async getDaily(@Request() req, @Request() query) {
-    const userId = req.user.sub;
-    const date = query.query.date ? new Date(query.query.date) : new Date();
-    return await this.insightsService.findDaily(userId, date);
-  }
-
-  @UseGuards(AuthGuard)
-  @Post('daily/generate')
-  async generateDaily(@Request() req, @Request() query) {
-    const userPayload = req.user;
-    const context = await this.insightsService.getUserCycleContext(userPayload.sub);
-    
-    const contextPrompt = `Usuaria en Día ${context?.currentDay || 'X'} del ciclo, Fase: ${context?.phase || 'Folicular'}.`;
-    const diagnosis = await this.aiClient.dispatchAnalysis(contextPrompt, context?.phase);
-    
-    const title = `Insight: Fase ${context?.phase || 'Actual'}`;
-    const description = `Día ${context?.currentDay || 'X'} · Análisis Hormonal IA`;
-    
-    return await this.insightsService.createInsight('', userPayload, diagnosis, title, description);
   }
 }

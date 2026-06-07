@@ -1,14 +1,31 @@
-import { NestFactory } from '@nestjs/core';
+﻿import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  // Inicializa la aplicación NestJS de forma segura
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para permitir conexiones externas (como desde el APK)
-  app.enableCors();
+  // Habilitar CORS para permitir conexiones externas
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+    methods: 'GET,POST,PUT,DELETE,PATCH,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+  });
 
-  // Tu Banner Magenta Industrial de AuraHealth+
+  // ValidationPipe global
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
+
+  // Health check endpoint para Render
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (req, res) => {
+    res.status(200).send({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
   console.log('\x1b[35m%s\x1b[0m', `
   #####################################################################
   #   AURAHEALTH+ HYBRID AI ECOSYSTEM | SISTEMA INDUSTRIAL            #
@@ -16,7 +33,6 @@ async function bootstrap() {
   #####################################################################
   `);
 
-  // Escucha en el puerto asignado por Render o 3000 por defecto
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
 }
