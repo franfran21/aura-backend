@@ -13,7 +13,7 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 let AuthService = class AuthService {
     constructor(usersService, jwtService) {
         this.usersService = usersService;
@@ -25,19 +25,16 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('Usuario no encontrado');
         }
-        if (password) {
+        if (password && user.password) {
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
                 throw new common_1.UnauthorizedException('Contraseña incorrecta');
             }
         }
-        if (user.status !== 'active') {
-            throw new common_1.UnauthorizedException('Usuario inactivo');
-        }
         const payload = { username: user.name, sub: user.id, role: user.role };
         return {
             access_token: this.jwtService.sign(payload),
-            system: 'AURAHEALTH+ HYBRID AI',
+            system: 'AURAHEALTH+ LUNA AI',
             user: {
                 id: user.id,
                 name: user.name,

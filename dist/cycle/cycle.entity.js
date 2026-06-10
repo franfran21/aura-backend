@@ -20,13 +20,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Cycle.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Date)
+    (0, typeorm_1.Column)({ type: 'date' }),
+    __metadata("design:type", String)
 ], Cycle.prototype, "lastPeriodDate", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 28 }),
     __metadata("design:type", Number)
 ], Cycle.prototype, "avgCycleLength", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 5 }),
+    __metadata("design:type", Number)
+], Cycle.prototype, "avgPeriodLength", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_entity_1.User)

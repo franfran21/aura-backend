@@ -1,4 +1,4 @@
-﻿import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { MetricsService } from './metrics.service';
 import { CycleService } from '../cycle/cycle.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -15,7 +15,9 @@ export class MetricsController {
   async getPredictions(@Request() req) {
     const userId = req.user.sub;
     const cycle = await this.cycleService.getCurrentCycle(userId);
-    
+    const stats = await this.cycleService.getStats(userId);
+    const totalCycles = stats.totalCycles;
+
     // Si no hay ciclo, enviamos datos base por defecto
     if (!cycle) {
       return {
@@ -25,7 +27,13 @@ export class MetricsController {
           { label: 'Progesterona', value: 'Pendiente de registro', color: '#534AB7' },
           { label: 'Fase', value: 'Desconocida', color: '#8B2252' }
         ],
-        recommendation: 'Registra tu último periodo para que Luna pueda predecir tus niveles hormonales.'
+        recommendation: 'Registra tu último periodo para que Luna pueda predecir tus niveles hormonales.',
+        nextPeriodDate: 'Pendiente',
+        ovulationWindow: 'Pendiente',
+        highEnergyDays: 'Pendiente',
+        pregnancyProbability: 'Desconocida',
+        hasEnoughData: false,
+        cyclesRegistered: 0
       };
     }
 
@@ -68,12 +76,57 @@ export class MetricsController {
       recommendation = 'La progesterona domina. Es normal sentir más hambre y necesidad de calma. Escucha a tu cuerpo.';
     }
 
+    // Calcular próxima fecha de período
+    const nextPeriodDate = cycle.nextPeriodDate;
+
+    // Calcular próxima ventana de ovulación
+    const lastPeriod = new Date(cycle.lastPeriodDate);
+    let targetPeriod = new Date(lastPeriod);
+    
+    // Si la ventana fértil actual ya pasó, calculamos para el próximo ciclo
+    if (cycle.currentDay > cycle.fertileWindow.end) {
+      targetPeriod.setDate(lastPeriod.getDate() + cycle.avgCycleLength);
+    }
+    
+    const fertileStart = new Date(targetPeriod);
+    fertileStart.setDate(targetPeriod.getDate() + cycle.fertileWindow.start - 1);
+    const fertileEnd = new Date(targetPeriod);
+    fertileEnd.setDate(targetPeriod.getDate() + cycle.fertileWindow.end - 1);
+    
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const formatCustomDate = (d: Date) => `${d.getDate()} de ${months[d.getMonth()]}`;
+    const ovulationWindow = `${formatCustomDate(fertileStart)} - ${formatCustomDate(fertileEnd)}`;
+
+    // Días con más energía: Días 6 al 16 del ciclo (Fase Folicular y Ovulatoria)
+    const highEnergyDays = 'Días 6 al 16 de tu ciclo';
+
+    // Probabilidad de embarazo por día
+    let pregnancyProbability = 'Baja';
+    const currentDay = cycle.currentDay;
+    if (currentDay >= cycle.fertileWindow.start && currentDay <= cycle.fertileWindow.end) {
+      pregnancyProbability = 'Alta';
+    } else if (
+      Math.abs(currentDay - cycle.fertileWindow.start) <= 2 || 
+      Math.abs(currentDay - cycle.fertileWindow.end) <= 2
+    ) {
+      pregnancyProbability = 'Media';
+    }
+
+    // Se necesitan al menos 2 ciclos para tener predicciones personalizadas precisas
+    const hasEnoughData = totalCycles >= 2;
+
     return {
       energyLevel: energy,
       factors,
       recommendation,
       phase: cycle.phase,
-      currentDay: cycle.currentDay
+      currentDay: cycle.currentDay,
+      nextPeriodDate,
+      ovulationWindow,
+      highEnergyDays,
+      pregnancyProbability,
+      hasEnoughData,
+      cyclesRegistered: totalCycles
     };
   }
 }

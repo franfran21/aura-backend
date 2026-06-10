@@ -155,7 +155,7 @@ export class CycleService {
       if (data.painLevel !== undefined) existing.painLevel = data.painLevel;
       if (data.skin !== undefined) existing.skin = data.skin;
       if (data.sleep !== undefined) existing.sleep = data.sleep;
-      if (data.symptoms !== undefined) existing.symptoms = data.symptoms.join(', ');
+      if (data.symptoms !== undefined) existing.symptoms = data.symptoms ? data.symptoms.join(', ') : existing.symptoms;
       if (data.intercourse !== undefined) existing.intercourse = data.intercourse;
       if (data.protected !== undefined) existing.protected = data.protected;
       if (data.notes !== undefined) existing.notes = data.notes;
@@ -244,23 +244,36 @@ export class CycleService {
     };
   }
 
-  async logCycle(userId: number, data: { startDate: string; endDate?: string; symptoms?: string[]; mood?: string; notes?: string }) {
+  async logCycle(userId: number, data: {
+    startDate: string;
+    endDate?: string;
+    symptoms?: string[];
+    mood?: string;
+    energy?: string;
+    flow?: string;
+    painLevel?: string;
+    skin?: string;
+    sleep?: string;
+    intercourse?: boolean;
+    protected?: boolean;
+    notes?: string;
+  }) {
     // 1. Establecer la fecha de inicio del periodo
     await this.setPeriodDate(userId, { date: data.startDate });
     
     // 2. Guardar los detalles adicionales en el log de ese día específico
     return await this.logDay(userId, {
       date: data.startDate,
+      flow: data.flow,
+      energy: data.energy,
       mood: data.mood,
+      painLevel: data.painLevel,
+      skin: data.skin,
+      sleep: data.sleep,
       symptoms: data.symptoms,
+      intercourse: data.intercourse,
+      protected: data.protected,
       notes: data.notes,
     });
-  }
-
-  private getPhase(diffDays: number, avgPeriodLength: number, avgCycleLength: number): string {
-    if (diffDays <= avgPeriodLength) return 'Menstrual';
-    if (diffDays >= 11 && diffDays <= 16) return 'Ovulatoria';
-    if (diffDays > 16 && diffDays <= avgCycleLength) return 'Lútea';
-    return 'Folicular';
   }
 }

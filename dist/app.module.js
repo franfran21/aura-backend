@@ -15,6 +15,7 @@ const insights_module_1 = require("./insights/insights.module");
 const ai_module_1 = require("./ai-engine/ai.module");
 const metrics_module_1 = require("./metrics/metrics.module");
 const cycle_module_1 = require("./cycle/cycle.module");
+const chat_module_1 = require("./chat/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -23,13 +24,11 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
-                host: 'localhost',
-                port: 5432,
-                username: 'postgres',
-                password: '120324',
-                database: 'aurahealth_db',
-                autoLoadEntities: true,
+                url: process.env.DATABASE_URL,
+                entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: true,
+                ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+                autoLoadEntities: true,
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
@@ -37,6 +36,7 @@ exports.AppModule = AppModule = __decorate([
             ai_module_1.AiModule,
             metrics_module_1.MetricsModule,
             cycle_module_1.CycleModule,
+            chat_module_1.ChatModule,
         ],
     })
 ], AppModule);

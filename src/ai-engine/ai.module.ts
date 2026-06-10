@@ -6,6 +6,6 @@ import { InsightsModule } from '../insights/insights.module';
 @Module({
   imports: [InsightsModule],
   providers: [AiService, AiClient],
-  exports: [AiService],
+  exports: [AiService, AiClient],
 })
 export class AiModule {}

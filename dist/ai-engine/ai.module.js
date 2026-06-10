@@ -18,7 +18,7 @@ exports.AiModule = AiModule = __decorate([
     (0, common_1.Module)({
         imports: [insights_module_1.InsightsModule],
         providers: [ai_service_1.AiService, ai_client_1.AiClient],
-        exports: [ai_service_1.AiService],
+        exports: [ai_service_1.AiService, ai_client_1.AiClient],
     })
 ], AiModule);
 //# sourceMappingURL=ai.module.js.map

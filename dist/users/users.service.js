@@ -28,6 +28,9 @@ let UsersService = class UsersService {
         const user = this.usersRepository.create(userData);
         return await this.usersRepository.save(user);
     }
+    async updatePushToken(userId, token) {
+        await this.usersRepository.update(userId, { pushToken: token });
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

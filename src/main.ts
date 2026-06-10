@@ -1,16 +1,15 @@
-﻿import { NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para permitir conexiones externas
+  // Habilitar CORS
   app.enableCors({
     origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    methods: 'GET,POST,PUT,DELETE,PATCH,OPTIONS',
-    allowedHeaders: 'Content-Type,Authorization',
   });
 
   // ValidationPipe global
@@ -20,10 +19,14 @@ async function bootstrap() {
     transform: true,
   }));
 
-  // Health check endpoint para Render
+  // Health check endpoint para Render sin autenticación
   const httpAdapter = app.getHttpAdapter();
   httpAdapter.get('/health', (req, res) => {
-    res.status(200).send({ status: 'ok', timestamp: new Date().toISOString() });
+    res.status(200).send({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: 'AuraHealth+ Backend',
+    });
   });
 
   console.log('\x1b[35m%s\x1b[0m', `

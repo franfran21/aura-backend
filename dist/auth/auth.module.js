@@ -22,7 +22,7 @@ exports.AuthModule = AuthModule = __decorate([
             users_module_1.UsersModule,
             jwt_1.JwtModule.register({
                 global: true,
-                secret: 'AURA_SUPER_SECRET_KEY_2026',
+                secret: process.env.JWT_SECRET || 'AURA_SUPER_SECRET_KEY_2026',
                 signOptions: { expiresIn: '8h' },
             }),
         ],

@@ -25,11 +25,26 @@ let InsightsService = class InsightsService {
         this.metricsService = metricsService;
         this.cycleService = cycleService;
     }
-    async createInsight(metricsRaw, user, aiDiagnosis) {
+    async findDaily(userId, date) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+        return await this.insightRepository.find({
+            where: {
+                user: { id: userId },
+                createdAt: (0, typeorm_2.Between)(start, end)
+            },
+            order: { createdAt: 'DESC' },
+        });
+    }
+    async createInsight(metricsRaw, user, aiDiagnosis, title, description) {
         const today = new Date();
         const metrics = await this.metricsService.getDailyMetrics(user.sub || user.id, today);
         const cycle = await this.cycleService.getCurrentCycle(user.sub || user.id);
         const newInsight = this.insightRepository.create({
+            title: title || 'Análisis Diario',
+            description: description || 'Basado en tus registros de hoy.',
             metricsRaw: metricsRaw || JSON.stringify(metrics),
             aiDiagnosis,
             user: { id: user.sub || user.id },

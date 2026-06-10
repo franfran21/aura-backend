@@ -1,4 +1,4 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -12,20 +12,11 @@ import { ChatModule } from './chat/chat.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      // Conexión para Supabase ( Railway inyectará DATABASE_URL )
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Útil para prototipos, cambiar a false en producción real con migraciones
+      synchronize: true,
+      ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
       autoLoadEntities: true,
-      ssl: {
-        rejectUnauthorized: false // Requerido por Supabase y Railway para conexiones SSL
-      },
-      // Configuración de pool para Supabase
-      extra: {
-        max: 20,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
-      }
     }),
     UsersModule,
     AuthModule,

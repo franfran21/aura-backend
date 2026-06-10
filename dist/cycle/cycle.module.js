@@ -10,13 +10,16 @@ exports.CycleModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const cycle_service_1 = require("./cycle.service");
+const cycle_controller_1 = require("./cycle.controller");
 const cycle_entity_1 = require("./cycle.entity");
+const cycle_log_entity_1 = require("./cycle-log.entity");
 let CycleModule = class CycleModule {
 };
 exports.CycleModule = CycleModule;
 exports.CycleModule = CycleModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([cycle_entity_1.Cycle])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([cycle_entity_1.Cycle, cycle_log_entity_1.CycleLog])],
+        controllers: [cycle_controller_1.CycleController],
         providers: [cycle_service_1.CycleService],
         exports: [cycle_service_1.CycleService],
     })

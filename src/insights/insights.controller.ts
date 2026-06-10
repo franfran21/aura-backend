@@ -1,4 +1,4 @@
-﻿import { Controller, Post, Body, Get, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Query } from '@nestjs/common';
 import { InsightsService } from './insights.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AiClient } from '../ai-engine/ai.client';
@@ -23,7 +23,13 @@ export class InsightsController {
       return await this.generateDaily(req, dateQuery);
     }
     
-    return insights;
+    return {
+      id: insights[0].id,
+      title: insights[0].title,
+      description: insights[0].description,
+      aiDiagnosis: insights[0].aiDiagnosis,
+      date: insights[0].createdAt,
+    };
   }
 
   @UseGuards(AuthGuard)
@@ -32,7 +38,7 @@ export class InsightsController {
     const userPayload = req.user;
     const context = await this.insightsService.getUserCycleContext(userPayload.sub);
 
-    const contextPrompt = `Genera un insight de salud para hoy. La usuaria está en el día ${context?.currentDay || 'desconocido'} de su ciclo, fase: ${context?.phase || 'desconocida'}.`;
+    const contextPrompt = `Genera un insight de salud para hoy en un tono empático y profesional como Luna. La usuaria está en el día ${context?.currentDay || 'desconocido'} de su ciclo, fase: ${context?.phase || 'desconocida'}.`;
     
     const diagnosis = await this.aiClient.dispatchAnalysis(contextPrompt, context?.phase);
 
@@ -40,7 +46,14 @@ export class InsightsController {
     const description = `Día ${context?.currentDay || 'X'} · Análisis Hormonal Luna`;
 
     const insight = await this.insightsService.createInsight('', userPayload, diagnosis, title, description);
-    return [insight];
+    
+    return {
+      id: insight.id,
+      title: insight.title,
+      description: insight.description,
+      aiDiagnosis: insight.aiDiagnosis,
+      date: insight.createdAt,
+    };
   }
 
   @UseGuards(AuthGuard)

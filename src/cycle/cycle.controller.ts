@@ -9,7 +9,20 @@ export class CycleController {
   @UseGuards(AuthGuard)
   @Post('log')
   async logCycleData(
-    @Body() body: { startDate: string; endDate?: string; symptoms?: string[]; mood?: string; notes?: string },
+    @Body() body: {
+      startDate: string;
+      endDate?: string;
+      symptoms?: string[];
+      mood?: string;
+      energy?: string;
+      flow?: string;
+      painLevel?: string;
+      skin?: string;
+      sleep?: string;
+      intercourse?: boolean;
+      protected?: boolean;
+      notes?: string;
+    },
     @Request() req,
   ) {
     const userId = req.user.sub;
@@ -41,6 +54,9 @@ export class CycleController {
     flow?: string;
     energy?: string;
     mood?: string;
+    painLevel?: string;
+    skin?: string;
+    sleep?: string;
     symptoms?: string[];
     intercourse?: boolean;
     protected?: boolean;

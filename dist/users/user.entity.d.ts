@@ -5,5 +5,6 @@ export declare class User {
     name?: string;
     role: string;
     status: string;
+    pushToken?: string;
     hashPassword(): Promise<void>;
 }

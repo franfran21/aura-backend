@@ -5,4 +5,5 @@ export declare class UsersService {
     constructor(usersRepository: Repository<User>);
     findAll(): Promise<[User[], number]>;
     create(userData: Partial<User>): Promise<User>;
+    updatePushToken(userId: number, token: string): Promise<void>;
 }

@@ -7,4 +7,9 @@ export declare class UsersController {
         count: number;
         data: import("./user.entity").User[];
     }>;
+    updatePushToken(body: {
+        token: string;
+    }, req: any): Promise<{
+        success: boolean;
+    }>;
 }
