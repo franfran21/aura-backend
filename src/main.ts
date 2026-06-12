@@ -6,11 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Habilitar CORS
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  app.enableCors({ origin: '*', credentials: true });
 
   // ValidationPipe global
   app.useGlobalPipes(new ValidationPipe({
@@ -25,7 +21,6 @@ async function bootstrap() {
     res.status(200).send({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      service: 'AuraHealth+ Backend',
     });
   });
 
